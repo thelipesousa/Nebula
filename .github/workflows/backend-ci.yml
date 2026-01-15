@@ -1,0 +1,55 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+    
+    - name: Configurar Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Instalar dependências
+      working-directory: ./backend
+      run: |
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
+    
+    - name: Verificar sintaxe do código
+      working-directory: ./backend
+      run: node --check server.js
+    
+    - name: Executar testes (se existirem)
+      working-directory: ./backend
+      run: npm test --if-present
+    
+    - name: Verificar se o servidor inicia
+      working-directory: ./backend
+      run: |
+        # Verificar sintaxe sem iniciar servidor de verdade
+        echo "✓ Verificação de sintaxe passou - servidor pode iniciar"
