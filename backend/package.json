@@ -1,0 +1,11 @@
+{
+  "name": "nebula-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.26.0"
+  }
+}
